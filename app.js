@@ -3,10 +3,9 @@ var http = require('http');
 var app = express();
 
 app.get('/', function(req, res){
-    res.writeHead(200, {"Content-Type": "text/plain"});
-    res.end("Hello World from express\n");
+    res.send('test param: ' + req.query.id);
 });
 
-app.listen(8000);
+app.listen(process.env.PORT || 8000);
 
 console.log("Server running at http://localhost:8000/");
