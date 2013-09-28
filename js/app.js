@@ -1,9 +1,13 @@
 (function() {
-  var app, express, http, radiusToBounds;
+  var app, express, http, queryString, radiusToBounds, request;
 
   express = require("express");
 
   http = require("http");
+
+  request = require('request');
+
+  queryString = require('querystring');
 
   app = express();
 
@@ -21,13 +25,30 @@
   };
 
   app.get("/", function(req, res) {
-    var lat, lng, radius, result;
+    var lat, lng, queryObj, queryParam, queryStr, radius, result, root;
     if ((req.query.lat != null) && (req.query.lng != null) && req.query.radius) {
       lat = parseFloat(req.query.lat);
       lng = parseFloat(req.query.lng);
       radius = parseFloat(req.query.radius);
       result = radiusToBounds(lat, lng, radius);
-      return res.send("lat_min:" + result.lat_min + "; lng_max:" + result.lng_max);
+      res.send("lat_ssmin:" + result.lat_min + "; lng_max:" + result.lng_max);
+      queryObj = {
+        limit: 20,
+        lat: lat,
+        lng: lng,
+        radius: radius
+      };
+      queryParam = queryString.stringify(queryObj);
+      root = "http://api.wikilocation.org/articles";
+      queryStr = root + '?' + queryParam;
+      console.log(queryStr);
+      return request(queryStr, function(err, res, body) {
+        var results;
+        if (!err && res.statusCode === 200) {
+          results = JSON.parse(body);
+          return console.log(results);
+        }
+      });
     }
   });
 
