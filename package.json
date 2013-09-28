@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-coffee": "~0.7.0"
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-watch": "~0.5.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
