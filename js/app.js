@@ -21,7 +21,14 @@
   };
 
   app.get("/", function(req, res) {
-    return res.send("test param: " + req.query.id);
+    var lat, lng, radius, result;
+    if ((req.query.lat != null) && (req.query.lng != null) && req.query.radius) {
+      lat = parseFloat(req.query.lat);
+      lng = parseFloat(req.query.lng);
+      radius = parseFloat(req.query.radius);
+      result = radiusToBounds(lat, lng, radius);
+      return res.send("lat_min:" + result.lat_min + "; lng_max:" + result.lng_max);
+    }
   });
 
   app.listen(process.env.PORT || 8000);
