@@ -1,10 +1,13 @@
 # Node.js sever of @tlas server.
-express = require("express")
-http = require("http")
+express = require('express')
+http = require('http')
+async = require('async')
 request = require('request')
 queryString = require('querystring')
 
 app = express()
+
+services = ['panoramio','instagram', 'wikipedia', 'youtube']
 
 radiusToBounds = (lat, lng, radius) ->
     angle = radius / 6371000
@@ -65,22 +68,28 @@ buildQuery = (service, coord) ->
     queryParam = queryString.stringify(queryObj)
     return root + '?' + queryParam
 
+createQuery = (coord) ->
+    return (service, callback)->
+        queryStr = buildQuery service, coord
+        console.log queryStr
+
+        request queryStr, (err, queryRes, body) ->
+            if (!err && queryRes.statusCode is 200)
+                results = JSON.parse body
+                console.log results
+                callback null, results
+
 app.get "/", (req, res) ->
     if req.query.lat? and req.query.lng? and req.query.radius
         lat = parseFloat req.query.lat
         lng = parseFloat req.query.lng
         radius = parseFloat req.query.radius
-
         coord = radiusToBounds lat, lng, radius
-        res.send "lat_ssmin:#{coord.lat_min}; lng_max:#{coord.lng_max}"
 
-        queryStr = buildQuery 'instagram', coord
-        console.log queryStr
+        APIquery = createQuery coord
 
-        request queryStr, (err, res, body) ->
-          if (!err && res.statusCode is 200)
-            results = JSON.parse body
-            console.log results
+        async.map services, APIquery, (err, results)->
+            console.log results.length
 
 app.listen process.env.PORT or 8000
 console.log "Server running at http://localhost:8000/"

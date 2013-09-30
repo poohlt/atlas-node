@@ -1,15 +1,19 @@
 (function() {
-  var app, buildQuery, express, http, queryString, radiusToBounds, request;
+  var app, async, buildQuery, createQuery, express, http, queryString, radiusToBounds, request, services;
 
-  express = require("express");
+  express = require('express');
 
-  http = require("http");
+  http = require('http');
+
+  async = require('async');
 
   request = require('request');
 
   queryString = require('querystring');
 
   app = express();
+
+  services = ['panoramio', 'instagram', 'wikipedia', 'youtube'];
 
   radiusToBounds = function(lat, lng, radius) {
     var angle, lng_delta, result;
@@ -84,22 +88,32 @@
     return root + '?' + queryParam;
   };
 
+  createQuery = function(coord) {
+    return function(service, callback) {
+      var queryStr;
+      queryStr = buildQuery(service, coord);
+      console.log(queryStr);
+      return request(queryStr, function(err, queryRes, body) {
+        var results;
+        if (!err && queryRes.statusCode === 200) {
+          results = JSON.parse(body);
+          console.log(results);
+          return callback(null, results);
+        }
+      });
+    };
+  };
+
   app.get("/", function(req, res) {
-    var coord, lat, lng, queryStr, radius;
+    var APIquery, coord, lat, lng, radius;
     if ((req.query.lat != null) && (req.query.lng != null) && req.query.radius) {
       lat = parseFloat(req.query.lat);
       lng = parseFloat(req.query.lng);
       radius = parseFloat(req.query.radius);
       coord = radiusToBounds(lat, lng, radius);
-      res.send("lat_ssmin:" + coord.lat_min + "; lng_max:" + coord.lng_max);
-      queryStr = buildQuery('instagram', coord);
-      console.log(queryStr);
-      return request(queryStr, function(err, res, body) {
-        var results;
-        if (!err && res.statusCode === 200) {
-          results = JSON.parse(body);
-          return console.log(results);
-        }
+      APIquery = createQuery(coord);
+      return async.map(services, APIquery, function(err, results) {
+        return console.log(results.length);
       });
     }
   });
