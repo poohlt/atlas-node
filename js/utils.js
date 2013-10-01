@@ -1,7 +1,9 @@
 (function() {
-  var queryString;
+  var queryString, request;
 
   queryString = require('querystring');
+
+  request = require('request');
 
   exports.radiusToBounds = function(lat, lng, radius) {
     var angle, lng_delta, result;
@@ -74,6 +76,23 @@
     }
     queryParam = queryString.stringify(queryObj);
     return root + '?' + queryParam;
+  };
+
+  exports.createQuery = function(coord) {
+    return function(service, callback) {
+      var queryStr;
+      queryStr = exports.buildQuery(service, coord);
+      console.log(queryStr);
+      return request(queryStr, function(err, queryRes, body) {
+        var parsedResult, result;
+        if (!err && queryRes.statusCode === 200) {
+          result = JSON.parse(body);
+          parsedResult = exports.parseResponse(service, result);
+          console.log(parsedResult);
+          return callback(null, parsedResult);
+        }
+      });
+    };
   };
 
   exports.parseResponse = function(service, response) {

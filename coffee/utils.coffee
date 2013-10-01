@@ -1,5 +1,6 @@
 # Helper functions for the server.
 queryString = require('querystring')
+request = require('request')
 
 # Turns a lat,lng,rad coord area into a rectangular area. Required by panoramio API
 exports.radiusToBounds = (lat, lng, radius) ->
@@ -61,6 +62,20 @@ exports.buildQuery = (service, coord) ->
 
     queryParam = queryString.stringify(queryObj)
     return root + '?' + queryParam
+
+# Higher order function that return a function for mapping. The returned function calles and API and handles the response data.
+exports.createQuery = (coord) ->
+  return (service, callback)->
+    queryStr = exports.buildQuery service, coord
+    console.log queryStr
+
+    request queryStr, (err, queryRes, body) ->
+      if (!err && queryRes.statusCode is 200)
+        result = JSON.parse body
+        parsedResult = exports.parseResponse service, result
+        console.log parsedResult
+        callback null, parsedResult
+
 
 # Parse different responses to create client readable data.
 exports.parseResponse = (service, response) ->
