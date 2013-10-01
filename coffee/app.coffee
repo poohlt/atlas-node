@@ -9,7 +9,7 @@ queryString = require('querystring')
 app = express()
 
 # Global service array. Keep record of all supported service.
-services = ['panoramio', 'wikipedia']
+services = ['panoramio', 'wikipedia', 'instagram']
 
 # Turns a lat,lng,rad coord area into a rectangular area. Required by panoramio API
 radiusToBounds = (lat, lng, radius) ->
@@ -95,11 +95,11 @@ parseResponse = (service, response) ->
           service: "panoramio"
           lat: item["latitude"]
           lng: item["longitude"]
-          time: item["upload_date"] # Probably needs to parse it
+          time: item["upload_date"] # Probably needs to parse time
           title: item["photo_title"]
           img_url: item["photo_file_url"]
           orig_url: item["photo_url"]
-        result.push item
+        result.push obj
     when 'wikipedia'
       for item in response['articles']
         obj =
@@ -109,7 +109,19 @@ parseResponse = (service, response) ->
           title: item["title"]
           img_url: "http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png"
           orig_url: item["url"]
-        result.push item
+        result.push obj
+    when 'instagram'
+      for item in response['data']
+        if item["caption"] && item["caption"]["text"]
+          obj =
+            service: "instagram"
+            lat: item["location"]["latitude"]
+            lng: item["location"]["longitude"]
+            time: item["created_time"]
+            title: item["caption"]["text"]
+            img_url: item["images"]["low_resolution"]["url"]
+            orig_url: item['link']
+          result.push obj
   return result
 
 # Handle get requests.

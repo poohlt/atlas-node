@@ -13,7 +13,7 @@
 
   app = express();
 
-  services = ['panoramio', 'wikipedia'];
+  services = ['panoramio', 'wikipedia', 'instagram'];
 
   radiusToBounds = function(lat, lng, radius) {
     var angle, lng_delta, result;
@@ -106,7 +106,7 @@
   };
 
   parseResponse = function(service, response) {
-    var item, obj, result, _i, _j, _len, _len1, _ref, _ref1;
+    var item, obj, result, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
     result = [];
     switch (service) {
       case 'panoramio':
@@ -122,7 +122,7 @@
             img_url: item["photo_file_url"],
             orig_url: item["photo_url"]
           };
-          result.push(item);
+          result.push(obj);
         }
         break;
       case 'wikipedia':
@@ -137,7 +137,25 @@
             img_url: "http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png",
             orig_url: item["url"]
           };
-          result.push(item);
+          result.push(obj);
+        }
+        break;
+      case 'instagram':
+        _ref2 = response['data'];
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          item = _ref2[_k];
+          if (item["caption"] && item["caption"]["text"]) {
+            obj = {
+              service: "instagram",
+              lat: item["location"]["latitude"],
+              lng: item["location"]["longitude"],
+              time: item["created_time"],
+              title: item["caption"]["text"],
+              img_url: item["images"]["low_resolution"]["url"],
+              orig_url: item['link']
+            };
+            result.push(obj);
+          }
         }
     }
     return result;
