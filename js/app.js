@@ -170,11 +170,14 @@
       coord = radiusToBounds(lat, lng, radius);
       APIquery = createQuery(coord);
       return async.map(services, APIquery, function(err, result) {
-        var flattened;
+        var flattened, responseObj;
         flattened = [].concat.apply([], result);
         console.log(flattened);
         console.log(flattened.length);
-        return res.send(flattened);
+        responseObj = {
+          photos: flattened
+        };
+        return res.send(responseObj);
       });
     }
   });

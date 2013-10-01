@@ -141,7 +141,9 @@ app.get "/", (req, res) ->
       flattened = [].concat.apply([], result)
       console.log flattened
       console.log flattened.length
-      res.send flattened
+      responseObj =
+        photos: flattened
+      res.send responseObj
 
 app.listen process.env.PORT or 8000
 console.log "Server running at http://localhost:8000/"
