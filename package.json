@@ -4,9 +4,12 @@
   "description": "node.js version of atlas backend",
   "main": "app.js",
   "dependencies": {
-    "express": "~3.4.0"
+    "express": "~3.4.0",
+    "request": "~2.27.0",
+    "async": "~0.2.9"
   },
   "devDependencies": {
+    "express": "~3.4.0",
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-contrib-watch": "~0.5.3",
