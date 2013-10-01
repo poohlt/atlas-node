@@ -1,10 +1,8 @@
-
-request = require('request')
+# Helper functions for the server.
 queryString = require('querystring')
 
 # Turns a lat,lng,rad coord area into a rectangular area. Required by panoramio API
-exports =
-  radiusToBounds: (lat, lng, radius) ->
+exports.radiusToBounds = (lat, lng, radius) ->
     angle = radius / 6371000
     angle *= 57.2958
     lng_delta = Math.asin(Math.sin(angle / 57.2958) / Math.cos(lat / 57.2958)) * 57.2958
@@ -17,8 +15,8 @@ exports =
       lng_min: lng - lng_delta
       lng_max: lng + lng_delta
 
-  # Build a query string based on coordinate and service.
-  buildQuery: (service, coord) ->
+# Build a query string based on coordinate and service.
+exports.buildQuery = (service, coord) ->
     switch service
       when 'wikipedia'
         queryObj =
@@ -64,21 +62,8 @@ exports =
     queryParam = queryString.stringify(queryObj)
     return root + '?' + queryParam
 
-  # Higher order function that return a function for mapping. The returned function calles and API and handles the response data.
-  createQuery: (coord) ->
-    return (service, callback)->
-      queryStr = this.buildQuery service, coord
-      console.log queryStr
-
-      request queryStr, (err, queryRes, body) ->
-        if (!err && queryRes.statusCode is 200)
-          result = JSON.parse body
-          parsedResult = parseResponse service, result
-          console.log parsedResult
-          callback null, parsedResult
-
-  # Parse different response and create client readable data.
-  parseResponse: (service, response) ->
+# Parse different responses to create client readable data.
+exports.parseResponse = (service, response) ->
     result = []
     switch service
       when 'panoramio'

@@ -2,13 +2,27 @@
 express = require('express')
 http = require('http')
 async = require('async')
-utils = require('./utils')
+utils = require("./utils")
+request = require('request')
 
 # Define the app
 app = express()
 
 # Global service array. Keep record of all supported service.
 services = ['panoramio', 'wikipedia', 'instagram']
+
+# Higher order function that return a function for mapping. The returned function calles and API and handles the response data.
+createQuery = (coord) ->
+  return (service, callback)->
+    queryStr = utils.buildQuery service, coord
+    console.log queryStr
+
+    request queryStr, (err, queryRes, body) ->
+      if (!err && queryRes.statusCode is 200)
+        result = JSON.parse body
+        parsedResult = utils.parseResponse service, result
+        console.log parsedResult
+        callback null, parsedResult
 
 # Handle get requests.
 app.get "/", (req, res) ->
@@ -20,7 +34,7 @@ app.get "/", (req, res) ->
     coord = utils.radiusToBounds lat, lng, radius
 
     # Build the API function used for mapping.
-    APIquery = utils.createQuery coord
+    APIquery = createQuery coord
 
     # Async mapping. Query all services asyncly.
     async.map services, APIquery, (err, result)->
