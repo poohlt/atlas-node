@@ -8,7 +8,7 @@ utils = require("./utils")
 app = express()
 
 # Global service array. Keep record of all supported service.
-services = ['panoramio', 'wikipedia', 'instagram']
+services = ['youtube']
 
 # Handle get requests.
 app.get "/", (req, res) ->
@@ -21,6 +21,8 @@ app.get "/", (req, res) ->
 
     # Build the API function used for mapping.
     APIquery = utils.createQuery coord
+
+    console.log APIquery
 
     # Async mapping. Query all services asyncly.
     async.map services, APIquery, (err, result)->

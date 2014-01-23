@@ -11,7 +11,7 @@
 
   app = express();
 
-  services = ['panoramio', 'wikipedia', 'instagram'];
+  services = ['youtube'];
 
   app.get("/", function(req, res) {
     var APIquery, coord, lat, lng, radius;
@@ -21,6 +21,7 @@
       radius = parseFloat(req.query.radius);
       coord = utils.radiusToBounds(lat, lng, radius);
       APIquery = utils.createQuery(coord);
+      console.log(APIquery);
       return async.map(services, APIquery, function(err, result) {
         var flattened, responseObj;
         flattened = [].concat.apply([], result);

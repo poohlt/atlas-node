@@ -114,4 +114,19 @@ exports.parseResponse = (service, response) ->
               img_url: item["images"]["low_resolution"]["url"]
               orig_url: item['link']
             result.push obj
+      when 'youtube'
+        for item in response['feed']['entry']
+          if item['georss$where']['gml$Point']['gml$pos']
+            geoStr = item['georss$where']['gml$Point']['gml$pos']['$t']
+            geoArr = geoStr.split(' ')
+            obj =
+              service: "youtube"
+              lat: parseFloat(geoArr[0])
+              lng: parseFloat(geoArr[1])
+              time: item['published']['$t']
+              title: item['title']['$t']
+              img_url: item['media$group']['media$thumbnail'][0]['url']
+              orig_url: item['link'][0]['href']
+            result.push obj
+
     return result

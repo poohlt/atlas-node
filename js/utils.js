@@ -96,7 +96,7 @@
   };
 
   exports.parseResponse = function(service, response) {
-    var item, obj, result, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+    var geoArr, geoStr, item, obj, result, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
     result = [];
     switch (service) {
       case 'panoramio':
@@ -143,6 +143,26 @@
               title: item["caption"]["text"],
               img_url: item["images"]["low_resolution"]["url"],
               orig_url: item['link']
+            };
+            result.push(obj);
+          }
+        }
+        break;
+      case 'youtube':
+        _ref3 = response['feed']['entry'];
+        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+          item = _ref3[_l];
+          if (item['georss$where']['gml$Point']['gml$pos']) {
+            geoStr = item['georss$where']['gml$Point']['gml$pos']['$t'];
+            geoArr = geoStr.split(' ');
+            obj = {
+              service: "youtube",
+              lat: parseFloat(geoArr[0]),
+              lng: parseFloat(geoArr[1]),
+              time: item['published']['$t'],
+              title: item['title']['$t'],
+              img_url: item['media$group']['media$thumbnail'][0]['url'],
+              orig_url: item['link'][0]['href']
             };
             result.push(obj);
           }
