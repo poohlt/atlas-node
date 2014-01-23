@@ -11,7 +11,7 @@
 
   app = express();
 
-  services = ['youtube'];
+  services = ['panoramio', 'instagram', 'wikipedia', 'youtube'];
 
   app.get("/", function(req, res) {
     var APIquery, coord, lat, lng, radius;

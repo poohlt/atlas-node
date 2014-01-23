@@ -8,7 +8,7 @@ utils = require("./utils")
 app = express()
 
 # Global service array. Keep record of all supported service.
-services = ['youtube']
+services = ['panoramio','instagram','wikipedia','youtube']
 
 # Handle get requests.
 app.get "/", (req, res) ->
