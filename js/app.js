@@ -28,7 +28,7 @@
         console.log(flattened);
         console.log("" + flattened.length + " entries returned");
         responseObj = {
-          photos: flattened
+          entries: flattened
         };
         return res.send(responseObj);
       });

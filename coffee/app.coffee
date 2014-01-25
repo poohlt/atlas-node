@@ -30,7 +30,7 @@ app.get "/", (req, res) ->
       console.log flattened
       console.log "#{flattened.length} entries returned"
       responseObj =
-        photos: flattened
+        entries: flattened
       res.send responseObj
 
 app.listen process.env.PORT or 8000
